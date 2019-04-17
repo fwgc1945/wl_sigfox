@@ -17,7 +17,7 @@ static UnaShieldV2S transceiver(country, useEmulator, device, echo);  // Uncomme
 #define echoPin 2 // Echo Pin
 #define trigPin 3 // Trigger Pin
 
-void setup() {  // Will be called only once.
+void setup() {
     
     // Sensorƒsƒ“ƒ‚[ƒhİ’è
     pinMode(echoPin, INPUT);
