@@ -16,61 +16,61 @@ static const Country country = COUNTRY_TW;  //Set this to your country to config
 static UnaShieldV2S transceiver(country, useEmulator, device, echo);  // Uncomment this for UnaBiz UnaShield V2S / V2S2 Dev Kit
 // static UnaShieldV1 transceiver(country, useEmulator, device, echo);  // Uncomment this for UnaBiz UnaShield V1 Dev Kit
 
-#define normally 100    //•½í(cm)
-#define coefficient 0.2 //ŒW”
+#define normally 100    //å¹³å¸¸æ™‚(cm)
+#define coefficient 0.2 //ä¿‚æ•°
 
 #define echoPin 2 // Echo Pin
 #define trigPin 3 // Trigger Pin
 
 /*****************************************/
 /*
- * ƒEƒHƒbƒ`ƒhƒbƒOˆ—‚ÌQlŒ³:2014/11/17 ƒ‰ƒWƒIƒyƒ“ƒ`‚³‚ñ http://radiopench.blog96.fc2.com/
+ * ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚°å‡¦ç†ã®å‚è€ƒå…ƒ:2014/11/17 ãƒ©ã‚¸ã‚ªãƒšãƒ³ãƒã•ã‚“ http://radiopench.blog96.fc2.com/
  */
  /*****************************************/
-void delayWDT_setup(unsigned int ii) { // ƒEƒHƒbƒ`ƒhƒbƒOƒ^ƒCƒ}[‚ğƒZƒbƒgB
- // ˆø”‚ÍWDTCSR‚ÉƒZƒbƒg‚·‚éWDP0-WDP3‚Ì’lBİ’è’l‚Æ“®ìŠÔ‚ÍŠT—ª‰º‹L
+void delayWDT_setup(unsigned int ii) { // ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚°ã‚¿ã‚¤ãƒãƒ¼ã‚’ã‚»ãƒƒãƒˆã€‚
+ // å¼•æ•°ã¯WDTCSRã«ã‚»ãƒƒãƒˆã™ã‚‹WDP0-WDP3ã®å€¤ã€‚è¨­å®šå€¤ã¨å‹•ä½œæ™‚é–“ã¯æ¦‚ç•¥ä¸‹è¨˜
  // 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms
  // 6=1sec, 7=2sec, 8=4sec, 9=8sec
     byte bb;
-    if (ii > 9) { // •Ï‚È’l‚ğ”rœ
+    if (ii > 9) { // å¤‰ãªå€¤ã‚’æ’é™¤
         ii = 9;
     }
-    bb = ii & 7; // ‰ºˆÊ3ƒrƒbƒg‚ğbb‚É
-    if (ii > 7) { // 7ˆÈãi7.8,9j‚È‚ç
-        bb |= (1 << 5); // bb‚Ì5ƒrƒbƒg–Ú(WDP3)‚ğ1‚É‚·‚é
+    bb = ii & 7; // ä¸‹ä½3ãƒ“ãƒƒãƒˆã‚’bbã«
+    if (ii > 7) { // 7ä»¥ä¸Šï¼ˆ7.8,9ï¼‰ãªã‚‰
+        bb |= (1 << 5); // bbã®5ãƒ“ãƒƒãƒˆç›®(WDP3)ã‚’1ã«ã™ã‚‹
     }
     bb |= (1 << WDCE);
 
     MCUSR &= ~(1 << WDRF); // MCU Status Reg. Watchdog Reset Flag ->0
     // start timed sequence
-    WDTCSR |= (1 << WDCE) | (1 << WDE); // ƒEƒHƒbƒ`ƒhƒbƒO•ÏX‹–‰ÂiWDCE‚Í4ƒTƒCƒNƒ‹‚Å©“®ƒŠƒZƒbƒgj
+    WDTCSR |= (1 << WDCE) | (1 << WDE); // ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚°å¤‰æ›´è¨±å¯ï¼ˆWDCEã¯4ã‚µã‚¤ã‚¯ãƒ«ã§è‡ªå‹•ãƒªã‚»ãƒƒãƒˆï¼‰
     // set new watchdog timeout value
-    WDTCSR = bb; // §ŒäƒŒƒWƒXƒ^‚ğİ’è
+    WDTCSR = bb; // åˆ¶å¾¡ãƒ¬ã‚¸ã‚¹ã‚¿ã‚’è¨­å®š
     WDTCSR |= _BV(WDIE);
 }
 
-ISR(WDT_vect) { // WDT‚ªƒ^ƒCƒ€ƒAƒbƒv‚µ‚½‚ÉÀs‚³‚ê‚éˆ—
- // wdt_cycle++; // •K—v‚È‚çƒRƒƒ“ƒgƒAƒEƒg‚ğŠO‚·
+ISR(WDT_vect) { // WDTãŒã‚¿ã‚¤ãƒ ã‚¢ãƒƒãƒ—ã—ãŸæ™‚ã«å®Ÿè¡Œã•ã‚Œã‚‹å‡¦ç†
+ // wdt_cycle++; // å¿…è¦ãªã‚‰ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã‚’å¤–ã™
 }
 
-void delayWDT(unsigned long t) { // ƒpƒ[ƒ_ƒEƒ“ƒ‚[ƒh‚Ådelay‚ğÀs
-    Serial.println("Goodnight!"); //“®ì’†‚Ì•\¦
+void delayWDT(unsigned long t) { // ãƒ‘ãƒ¯ãƒ¼ãƒ€ã‚¦ãƒ³ãƒ¢ãƒ¼ãƒ‰ã§delayã‚’å®Ÿè¡Œ
+    Serial.println("Goodnight!"); //å‹•ä½œä¸­ã®è¡¨ç¤º
     delay(100);
 
-    delayWDT_setup(t); // ƒEƒHƒbƒ`ƒhƒbƒOƒ^ƒCƒ}[Š„‚è‚İğŒİ’è
-    ADCSRA &= ~(1 << ADEN); // ADENƒrƒbƒg‚ğƒNƒŠƒA‚µ‚ÄADC‚ğ’â~i120ƒÊAß–ñj
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN); // ƒpƒ[ƒ_ƒEƒ“ƒ‚[ƒh
+    delayWDT_setup(t); // ã‚¦ã‚©ãƒƒãƒãƒ‰ãƒƒã‚°ã‚¿ã‚¤ãƒãƒ¼å‰²ã‚Šè¾¼ã¿æ¡ä»¶è¨­å®š
+    ADCSRA &= ~(1 << ADEN); // ADENãƒ“ãƒƒãƒˆã‚’ã‚¯ãƒªã‚¢ã—ã¦ADCã‚’åœæ­¢ï¼ˆ120Î¼Aç¯€ç´„ï¼‰
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN); // ãƒ‘ãƒ¯ãƒ¼ãƒ€ã‚¦ãƒ³ãƒ¢ãƒ¼ãƒ‰
     sleep_enable();
 
-    sleep_mode(); // ‚±‚±‚ÅƒXƒŠ[ƒv‚É“ü‚é
+    sleep_mode(); // ã“ã“ã§ã‚¹ãƒªãƒ¼ãƒ—ã«å…¥ã‚‹
 
-    sleep_disable(); // WDT‚ªƒ^ƒCƒ€ƒAƒbƒv‚Å‚±‚±‚©‚ç“®ìÄŠJ 
-    ADCSRA |= (1 << ADEN); // ADC‚Ì“dŒ¹‚ğON (|=‚ª!=‚É‚È‚Á‚Ä‚¢‚½ƒoƒO‚ğC³2014/11/17)
+    sleep_disable(); // WDTãŒã‚¿ã‚¤ãƒ ã‚¢ãƒƒãƒ—ã§ã“ã“ã‹ã‚‰å‹•ä½œå†é–‹ 
+    ADCSRA |= (1 << ADEN); // ADCã®é›»æºã‚’ON (|=ãŒ!=ã«ãªã£ã¦ã„ãŸãƒã‚°ã‚’ä¿®æ­£2014/11/17)
 }
 
 void setup() {
     
-    // Sensorƒsƒ“ƒ‚[ƒhİ’è
+    // Sensorãƒ”ãƒ³ãƒ¢ãƒ¼ãƒ‰è¨­å®š
     pinMode(echoPin, INPUT);
     pinMode(trigPin, OUTPUT);
                 
@@ -98,10 +98,10 @@ void loop() {
     transceiver.getTemperature(temperature);
     transceiver.getVoltage(voltage);
 
-    // ‹——£‚ğæ“¾
+    // è·é›¢ã‚’å–å¾—
     distance = getDistance(temperature);
 
-    //•Ï“®’l‚ğ‹‚ß‚é
+    //å¤‰å‹•å€¤ã‚’æ±‚ã‚ã‚‹
     float result = distance / savDistance;
     if (distance > savDistance)
     {
@@ -112,7 +112,7 @@ void loop() {
         result = 1- result;
     }
 
-    //Œv‘ª‰ñ”‚ğ‰ÁZ
+    //è¨ˆæ¸¬å›æ•°ã‚’åŠ ç®—
     counter++;
     
     Serial.print("distance:");
@@ -122,11 +122,11 @@ void loop() {
     Serial.print("counter:");
     Serial.println(counter);
 
-    //Œv‘ª’l‚ª•½íˆÈ‰º‚Ìê‡A‘O‰ñŒv‘ª’l‚æ‚èŒW”’l•ª•Ï“®‚µ‚Ä‚¢‚éê‡A
-    //‰ß‹6‰ñŒv‘ª‚µ‚Ä‘—M‚µ‚Ä‚¢‚È‚¢ê‡‚É‘—M
+    //è¨ˆæ¸¬å€¤ãŒå¹³å¸¸æ™‚ä»¥ä¸‹ã®å ´åˆã€å‰å›è¨ˆæ¸¬å€¤ã‚ˆã‚Šä¿‚æ•°å€¤åˆ†å¤‰å‹•ã—ã¦ã„ã‚‹å ´åˆã€
+    //éå»6å›è¨ˆæ¸¬ã—ã¦é€ä¿¡ã—ã¦ã„ãªã„å ´åˆã«é€ä¿¡
     if (distance <= normally || result > coefficient || counter >= 6)
     {
-        // sendMessage‚ğì¬(12 bytes)
+        // sendMessageã‚’ä½œæˆ(12 bytes)
         String msg = transceiver.toHex(temperature) // 4 bytes
             + transceiver.toHex(voltage)    // 4 bytes
             + transceiver.toHex(distance);  // 4 bytes
@@ -135,29 +135,29 @@ void loop() {
         transceiver.sendMessage(msg);
         Serial.println("Send the message!!!");
 
-        //Œv‘ª‰ñ”‚ğƒNƒŠƒA
+        //è¨ˆæ¸¬å›æ•°ã‚’ã‚¯ãƒªã‚¢
         counter = 0;
     }
 
-    //Œv‘ª’l‚ğ‘Ş”ğ
+    //è¨ˆæ¸¬å€¤ã‚’é€€é¿
     savDistance = distance;
 
     //  Delay 10 seconds before sending next message.
     Serial.println("Waiting 10 seconds...");
     
-    //Œv‘ª‚Í10•ª–ˆi8*75=600•bƒXƒŠ[ƒvj
+    //è¨ˆæ¸¬ã¯10åˆ†æ¯ï¼ˆ8*75=600ç§’ã‚¹ãƒªãƒ¼ãƒ—ï¼‰
     for (size_t i = 0; i < 75; i++)
     {
-        //ƒXƒŠ[ƒvó‘Ô‚ÖˆÚs
+        //ã‚¹ãƒªãƒ¼ãƒ—çŠ¶æ…‹ã¸ç§»è¡Œ
         delayWDT(9);
     }
 }
 
-//‹——£‚ğæ“¾
+//è·é›¢ã‚’å–å¾—
 int getDistance(float temp) {
 
-    float Duration = 0; //óM‚µ‚½ŠÔŠu
-    float Distance = 0; //‹——£
+    float Duration = 0; //å—ä¿¡ã—ãŸé–“éš”
+    float Distance = 0; //è·é›¢
 
     float arrayDistance[8];
     int length = 8;
@@ -165,27 +165,27 @@ int getDistance(float temp) {
     for (size_t i = 0; i < length; i++) {
         digitalWrite(trigPin, LOW);
         delayMicroseconds(2);
-        digitalWrite(trigPin, HIGH); //’´‰¹”g‚ğo—Í
+        digitalWrite(trigPin, HIGH); //è¶…éŸ³æ³¢ã‚’å‡ºåŠ›
         delayMicroseconds(10); //
         digitalWrite(trigPin, LOW);
-        Duration = pulseIn(echoPin, HIGH); //ƒZƒ“ƒT‚©‚ç‚Ì“ü—Í
+        Duration = pulseIn(echoPin, HIGH); //ã‚»ãƒ³ã‚µã‹ã‚‰ã®å…¥åŠ›
 
         if (Duration > 0) {
-            Duration = Duration / 2; //‰•œ‹——£‚ğ”¼•ª‚É‚·‚é
+            Duration = Duration / 2; //å¾€å¾©è·é›¢ã‚’åŠåˆ†ã«ã™ã‚‹
             float sspeed = 331.5 + 0.6 * temp;
-            //Distance = Duration * 340 * 100 / 1000000; // ‰¹‘¬‚ğ340m/s‚Éİ’è
-            Distance = Duration * sspeed * 100 / 1000000; // ‰¹‘¬‚ğ‰·“x‚ğl—¶‚µ‚½’l‚Éİ’è
+            //Distance = Duration * 340 * 100 / 1000000; // éŸ³é€Ÿã‚’340m/sã«è¨­å®š
+            Distance = Duration * sspeed * 100 / 1000000; // éŸ³é€Ÿã‚’æ¸©åº¦ã‚’è€ƒæ…®ã—ãŸå€¤ã«è¨­å®š
             Serial.print("Distance:");
             Serial.print(Distance);
             Serial.println(" cm");
 
-            // ’l‚ğ”z—ñ‚ÉŠi”[
+            // å€¤ã‚’é…åˆ—ã«æ ¼ç´
             arrayDistance[i] = Distance;
         }
         delay(1000);
     }
 
-    // ”’l‚ğ¸‡‚Éƒ\[ƒg
+    // æ•°å€¤ã‚’æ˜‡é †ã«ã‚½ãƒ¼ãƒˆ
     float tmp;
     for (size_t i = 0; i < length; ++i) {
         for (size_t j = i + 1; j < length; ++j) {
@@ -201,7 +201,7 @@ int getDistance(float temp) {
     float sumDistance = 0;
     for (size_t i = 1; i < length -1 ; i++) {
 
-        // ZEROAÅ¬’lAÅ‘å’l‚ğœ‚­ƒTƒ}ƒŠ[‚ğì¬
+        // ZEROã€æœ€å°å€¤ã€æœ€å¤§å€¤ã‚’é™¤ãã‚µãƒãƒªãƒ¼ã‚’ä½œæˆ
         if (arrayDistance[i] != 0) {
             sumDistance += arrayDistance[i];
             ix1 += 1;
@@ -213,6 +213,6 @@ int getDistance(float temp) {
     Serial.println(sumDistance);
     Serial.println(ix1);
 
-    // •½‹Ï’l‚ğ•Ô‚·
+    // å¹³å‡å€¤ã‚’è¿”ã™
     return sumDistance / ix1;
 }
