@@ -142,8 +142,7 @@ void loop() {
     //計測値を退避
     savDistance = distance;
 
-    //  Delay 10 seconds before sending next message.
-    Serial.println("Waiting 10 seconds...");
+    Serial.println("Waiting 10 minutes...");
     
     //計測は10分毎（8*75=600秒スリープ）
     for (size_t i = 0; i < 75; i++)
