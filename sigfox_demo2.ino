@@ -16,11 +16,23 @@ static const Country country = COUNTRY_TW;  //Set this to your country to config
 static UnaShieldV2S transceiver(country, useEmulator, device, echo);  // Uncomment this for UnaBiz UnaShield V2S / V2S2 Dev Kit
 // static UnaShieldV1 transceiver(country, useEmulator, device, echo);  // Uncomment this for UnaBiz UnaShield V1 Dev Kit
 
-#define normally 100    //平常時(cm)
+//#define normally 100  //平常時(cm)
+#define normally 1000   //平常時(cm)デモ用設定
+#define marginTop 5     // 平常時の上マージン(cm)
+#define marginBottom 5  // 平常時の下マージン(cm)
 #define coefficient 0.2 //係数
+
+#define sendCycle 12    // 送信サイクル
+#define number 10       // センサー計測回数
 
 #define echoPin 2 // Echo Pin
 #define trigPin 3 // Trigger Pin
+
+// センサー用電源
+const int powerPin = 10;
+
+const int sleeping_count = 7;      // スリープ回数 8*n＝スリープ（秒）
+
 
 /*****************************************/
 /*
@@ -90,6 +102,10 @@ void loop() {
     static float savDistance = normally;
 
     Serial.print(F("\nRunning loop #")); Serial.println(counter);
+    delay(3000);
+
+    // センサー用電源ON
+    digitalWrite(powerPin, HIGH);
 
     // Get temperature and voltage of the SIGFOX module.
     float temperature;
@@ -122,10 +138,15 @@ void loop() {
     Serial.print("counter:");
     Serial.println(counter);
 
-    //計測値が平常時以下の場合、前回計測値より係数値分変動している場合、
-    //過去6回計測して送信していない場合に送信
-    if (distance <= normally || result > coefficient || counter >= 6)
-    {
+    // 水位が前回より上がっている場合、平常時－marginTopまでは平常とする
+    // 水位が前回より下がっている場合、平常時＋marginBottomまでは異常とする
+    // 前回計測値より係数値分変動している場合、
+    // 送信サイクル回計測して送信していない場合に送信
+    if ((distance < savDistance  && distance <= normally - marginTop)
+        || (distance > savDistance  && distance >= normally + marginBottom)
+        || (result > coefficient)
+        || (counter > sendCycle)) {
+
         // sendMessageを作成(12 bytes)
         String msg = transceiver.toHex(temperature) // 4 bytes
             + transceiver.toHex(voltage)    // 4 bytes
@@ -142,11 +163,14 @@ void loop() {
     //計測値を退避
     savDistance = distance;
 
-    Serial.println("Waiting 10 minutes...");
-    
-    //計測は10分毎（8*75=600秒スリープ）
-    for (size_t i = 0; i < 75; i++)
-    {
+    // センサー用電源OFF
+    digitalWrite(powerPin, LOW);
+
+    Serial.println("... in deep dleep!");
+
+    //　スリープ回数*8＝スリープ（秒）
+    for (size_t i = 0; i < sleeping_count; i++)
+        {
         //スリープ状態へ移行
         delayWDT(9);
     }
@@ -158,8 +182,8 @@ int getDistance(float temp) {
     float Duration = 0; //受信した間隔
     float Distance = 0; //距離
 
-    float arrayDistance[8];
-    int length = 8;
+    float arrayDistance[number];
+    int length = number;
 
     for (size_t i = 0; i < length; i++) {
         digitalWrite(trigPin, LOW);
