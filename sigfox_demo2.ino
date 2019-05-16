@@ -33,7 +33,6 @@ const int powerPin = 10;
 
 const int sleeping_count = 7;      // スリープ回数 8*n＝スリープ（秒）
 
-
 /*****************************************/
 /*
  * ウォッチドッグ処理の参考元:2014/11/17 ラジオペンチさん http://radiopench.blog96.fc2.com/
@@ -85,7 +84,8 @@ void setup() {
     // Sensorピンモード設定
     pinMode(echoPin, INPUT);
     pinMode(trigPin, OUTPUT);
-                
+    pinMode(powerPin, OUTPUT);
+                    
     // Initialize console so we can see debug messages (9600 bits per second).
     Serial.begin(9600);  Serial.println(F("Running setup..."));
     // Check whether the SIGFOX module is functioning.
@@ -176,7 +176,11 @@ void loop() {
     }
 }
 
-//距離を取得
+/*
+    超音波距離センサーより距離を取得し、移動平均フィルタを通した値を返します。
+    param: 温度
+    return: 計測距離
+*/
 int getDistance(float temp) {
 
     float Duration = 0; //受信した間隔
