@@ -22,7 +22,7 @@ static UnaShieldV2S transceiver(country, useEmulator, device, echo);  // Uncomme
 #define marginBottom 5  // 平常時の下マージン(cm)
 #define coefficient 0.2 //係数
 
-#define sendCycle 12    // 送信サイクル
+#define sendCycle 0    // 送信サイクル
 #define number 10       // センサー計測回数
 
 #define echoPin 2 // Echo Pin
@@ -87,7 +87,7 @@ void setup() {
     pinMode(powerPin, OUTPUT);
                     
     // Initialize console so we can see debug messages (9600 bits per second).
-    Serial.begin(9600);  Serial.println(F("Running setup..."));
+    Serial.begin(57600);  Serial.println(F("Running setup..."));
     // Check whether the SIGFOX module is functioning.
     if (!transceiver.begin()) stop(F("Unable to init SIGFOX module, may be missing"));  //  Will never return.
 
@@ -102,10 +102,10 @@ void loop() {
     static float savDistance = normally;
 
     Serial.print(F("\nRunning loop #")); Serial.println(counter);
-    delay(3000);
 
     // センサー用電源ON
     digitalWrite(powerPin, HIGH);
+    delay(5000);
 
     // Get temperature and voltage of the SIGFOX module.
     float temperature;
@@ -153,8 +153,8 @@ void loop() {
             + transceiver.toHex(distance);  // 4 bytes
 
         // Send the message.
-        transceiver.sendMessage(msg);
         Serial.println("Send the message!!!");
+        transceiver.sendMessage(msg);
 
         //計測回数をクリア
         counter = 0;
